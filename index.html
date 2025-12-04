@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Image Fullscreen Viewer</title>
+<title>Media Fullscreen Viewer</title>
 
 <style>
     body {
@@ -52,11 +52,11 @@
         background: #2594c5;
     }
 
-    #imgUploader {
+    #fileInput {
         display: none;
     }
 
-    #imageWrapper {
+    #mediaWrapper {
         margin-top: 30px;
         display: none;
         width: 100%;
@@ -91,54 +91,71 @@
 
 <body>
 
-<h2>Upload an Image</h2>
+<h2>Upload Media (Image, GIF, MP4)</h2>
 
 <div class="upload-box" id="dropZone">
-    <p>Drag & Drop Image Here</p>
-    <label id="uploadLabel" for="imgUploader">Choose Image</label>
-    <input type="file" accept="image/*" id="imgUploader">
+    <p>Drag & Drop Your Media Here</p>
+    <label id="uploadLabel" for="fileInput">Choose File</label>
+    <input type="file" accept="image/*,video/mp4" id="fileInput">
 </div>
 
-<div id="imageWrapper">
-    <img id="preview" alt="Preview">
-</div>
+<div id="mediaWrapper"></div>
 
 <script>
-    const uploader = document.getElementById("imgUploader");
-    const preview = document.getElementById("preview");
-    const wrapper = document.getElementById("imageWrapper");
-    const dropZone = document.getElementById("dropZone");
+const fileInput = document.getElementById("fileInput");
+const mediaWrapper = document.getElementById("mediaWrapper");
+const dropZone = document.getElementById("dropZone");
 
-    function handleFile(file) {
-        preview.src = URL.createObjectURL(file);
-        wrapper.style.display = "block";
-        setTimeout(() => preview.classList.add("visible"), 10);
+function handleFile(file) {
+    mediaWrapper.innerHTML = ""; 
+    const type = file.type;
+
+    let mediaElement;
+    if (type.startsWith("image/")) {
+        mediaElement = document.createElement("img");
+        mediaElement.src = URL.createObjectURL(file);
+    } else if (type === "video/mp4") {
+        mediaElement = document.createElement("video");
+        mediaElement.src = URL.createObjectURL(file);
+        mediaElement.controls = true;
+        mediaElement.autoplay = true;
+        mediaElement.loop = true;
+    } else {
+        alert("Unsupported file type!");
+        return;
     }
 
-    uploader.addEventListener("change", () => {
-        if (uploader.files[0]) handleFile(uploader.files[0]);
-    });
+    mediaElement.id = "preview";
+    mediaWrapper.appendChild(mediaElement);
+    mediaWrapper.style.display = "block";
 
-    dropZone.addEventListener("dragover", (e) => {
-        e.preventDefault();
-        dropZone.classList.add("dragover");
-    });
+    setTimeout(() => mediaElement.classList.add("visible"), 10);
+}
 
-    dropZone.addEventListener("dragleave", () => {
-        dropZone.classList.remove("dragover");
-    });
+dropZone.addEventListener("dragover", e => {
+    e.preventDefault();
+    dropZone.classList.add("dragover");
+});
 
-    dropZone.addEventListener("drop", (e) => {
-        e.preventDefault();
-        dropZone.classList.remove("dragover");
-        if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
-    });
+dropZone.addEventListener("dragleave", () => {
+    dropZone.classList.remove("dragover");
+});
 
-    wrapper.addEventListener("click", () => {
-        if (wrapper.requestFullscreen) wrapper.requestFullscreen();
-        else if (wrapper.webkitRequestFullscreen) wrapper.webkitRequestFullscreen();
-        else if (wrapper.msRequestFullscreen) wrapper.msRequestFullscreen();
-    });
+dropZone.addEventListener("drop", e => {
+    e.preventDefault();
+    dropZone.classList.remove("dragover");
+    if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+});
+
+fileInput.addEventListener("change", () => {
+    if (fileInput.files[0]) handleFile(fileInput.files[0]);
+});
+
+mediaWrapper.addEventListener("click", () => {
+    if (mediaWrapper.requestFullscreen) mediaWrapper.requestFullscreen();
+    else if (mediaWrapper.webkitRequestFullscreen) mediaWrapper.webkitRequestFullscreen();
+    else if (mediaWrapper.msRequestFullscreen) mediaWrapper.msRequestFullscreen();
+});
 </script>
 
 </body>
