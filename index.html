@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Fullscreen Viewer</title>
+
+<style>
+    body {
+        font-family: "Inter", Arial, sans-serif;
+        background: #ffffff;
+        color: #222;
+        margin: 0;
+        padding: 30px;
+        text-align: center;
+    }
+
+    h2 {
+        color: #30a9e0;
+        font-weight: 600;
+    }
+
+    .upload-box {
+        margin: 30px auto;
+        padding: 40px;
+        width: min(90%, 500px);
+        background: #f9f9f9;
+        border: 2px dashed #30a9e055;
+        border-radius: 16px;
+        transition: 0.3s;
+    }
+
+    .upload-box.dragover {
+        border-color: #30a9e0;
+        background: #e9f6ff;
+    }
+
+    #uploadLabel {
+        display: inline-block;
+        padding: 12px 24px;
+        font-size: 16px;
+        color: white;
+        background: #30a9e0;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.25s;
+        box-shadow: 0px 4px 10px rgba(48,169,224,0.3);
+        margin-top: 10px;
+    }
+
+    #uploadLabel:hover {
+        background: #2594c5;
+    }
+
+    #imgUploader {
+        display: none;
+    }
+
+    #imageWrapper {
+        margin-top: 30px;
+        display: none;
+        width: 100%;
+        text-align: center;
+        cursor: pointer;
+    }
+
+    #preview {
+        max-width: 95%;
+        max-height: 80vh;
+        border-radius: 12px;
+        box-shadow: 0px 8px 25px rgba(0,0,0,0.15);
+        opacity: 0;
+        transform: scale(0.98);
+        transition: 0.4s ease;
+        display: block;
+        margin: 0 auto;
+    }
+
+    #preview.visible {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    p {
+        color: #666;
+        font-size: 14px;
+        margin-top: 10px;
+    }
+</style>
+</head>
+
+<body>
+
+<h2>Upload an Image</h2>
+
+<div class="upload-box" id="dropZone">
+    <p>Drag & Drop Image Here</p>
+    <label id="uploadLabel" for="imgUploader">Choose Image</label>
+    <input type="file" accept="image/*" id="imgUploader">
+</div>
+
+<div id="imageWrapper">
+    <img id="preview" alt="Preview">
+</div>
+
+<script>
+    const uploader = document.getElementById("imgUploader");
+    const preview = document.getElementById("preview");
+    const wrapper = document.getElementById("imageWrapper");
+    const dropZone = document.getElementById("dropZone");
+
+    function handleFile(file) {
+        preview.src = URL.createObjectURL(file);
+        wrapper.style.display = "block";
+        setTimeout(() => preview.classList.add("visible"), 10);
+    }
+
+    uploader.addEventListener("change", () => {
+        if (uploader.files[0]) handleFile(uploader.files[0]);
+    });
+
+    dropZone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropZone.classList.add("dragover");
+    });
+
+    dropZone.addEventListener("dragleave", () => {
+        dropZone.classList.remove("dragover");
+    });
+
+    dropZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropZone.classList.remove("dragover");
+        if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+    });
+
+    wrapper.addEventListener("click", () => {
+        if (wrapper.requestFullscreen) wrapper.requestFullscreen();
+        else if (wrapper.webkitRequestFullscreen) wrapper.webkitRequestFullscreen();
+        else if (wrapper.msRequestFullscreen) wrapper.msRequestFullscreen();
+    });
+</script>
+
+</body>
+</html>
