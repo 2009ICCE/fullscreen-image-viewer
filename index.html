@@ -6,116 +6,110 @@
 <title>Fullscreen Media Viewer</title>
 
 <style>
-    body {
-        font-family: "Inter", Arial, sans-serif;
-        background: #ffffff;
-        color: #222;
-        margin: 0;
-        padding: 30px;
-        text-align: center;
-    }
+body {
+    font-family: "Inter", Arial, sans-serif;
+    background: #ffffff;
+    color: #222;
+    margin: 0;
+    padding: 30px;
+    text-align: center;
+}
 
-    h2 {
-        color: #30a9e0;
-        font-weight: 600;
-    }
+h2 {
+    color: #30a9e0;
+    font-weight: 600;
+}
 
-    .upload-box {
-        margin: 30px auto;
-        padding: 40px;
-        width: min(90%, 500px);
-        background: #f9f9f9;
-        border: 2px dashed #30a9e055;
-        border-radius: 16px;
-        transition: 0.3s;
-    }
+.upload-box {
+    margin: 30px auto;
+    padding: 40px;
+    width: min(90%, 500px);
+    background: #f9f9f9;
+    border: 2px dashed #30a9e055;
+    border-radius: 16px;
+    transition: 0.3s;
+}
 
-    .upload-box.dragover {
-        border-color: #30a9e0;
-        background: #e9f6ff;
-    }
+.upload-box.dragover {
+    border-color: #30a9e0;
+    background: #e9f6ff;
+}
 
-    #uploadLabel {
-        display: inline-block;
-        padding: 12px 24px;
-        font-size: 16px;
-        color: white;
-        background: #30a9e0;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: 0.25s;
-        box-shadow: 0px 4px 10px rgba(48,169,224,0.3);
-        margin-top: 10px;
-    }
+#uploadLabel {
+    display: inline-block;
+    padding: 12px 24px;
+    font-size: 16px;
+    color: white;
+    background: #30a9e0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.25s;
+    box-shadow: 0px 4px 10px rgba(48,169,224,0.3);
+    margin-top: 10px;
+}
 
-    #uploadLabel:hover {
-        background: #2594c5;
-    }
+#uploadLabel:hover {
+    background: #2594c5;
+}
 
-    #fileInput {
-        display: none;
-    }
+#fileInput { display: none; }
 
-    #mediaWrapper {
-        margin-top: 30px;
-        display: none;
-        width: 100%;
-        text-align: center;
-        cursor: pointer;
-    }
+#mediaWrapper {
+    margin-top: 30px;
+    display: none;
+    width: 100%;
+    text-align: center;
+    cursor: pointer;
+}
 
-    #preview {
-        max-width: 95%;
-        max-height: 80vh;
-        border-radius: 12px;
-        box-shadow: 0px 8px 25px rgba(0,0,0,0.15);
-        opacity: 0;
-        transform: scale(0.98);
-        transition: 0.4s ease;
-        display: block;
-        margin: 0 auto;
-    }
+#preview {
+    max-width: 95%;
+    max-height: 80vh;
+    border-radius: 12px;
+    box-shadow: 0px 8px 25px rgba(0,0,0,0.15);
+    opacity: 0;
+    transform: scale(0.98);
+    transition: 0.4s ease;
+    display: block;
+    margin: 0 auto;
+}
 
-    #preview.visible {
-        opacity: 1;
-        transform: scale(1);
-    }
+#preview.visible {
+    opacity: 1;
+    transform: scale(1);
+}
 
-    /* Fullscreen overlay */
-    #fullscreenOverlay {
-        display: none;
-        position: fixed;
-        top:0;
-        left:0;
-        width:100%;
-        height:100%;
-        background:black;
-        justify-content:center;
-        align-items:center;
-        z-index:9999;
-        cursor: pointer;
-    }
+/* Fullscreen overlay */
+#fullscreenOverlay {
+    display: none;
+    position: fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:black;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+    cursor: pointer;
+}
 
-    #fsContent {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+#fsContent {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-    #fsContent img,
-    #fsContent video {
-        width: 100%;
-        height: 100%;
-        object-fit: contain; /* keeps aspect ratio */
-    }
+#fsContent img,
+#fsContent video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
 
-    p {
-        color: #666;
-        font-size: 14px;
-        margin-top: 10px;
-    }
+p { color: #666; font-size: 14px; margin-top: 10px; }
 </style>
 </head>
 
@@ -155,9 +149,7 @@ function handleFile(file) {
     } else if (type === "video/mp4") {
         mediaElement = document.createElement("video");
         mediaElement.src = URL.createObjectURL(file);
-        mediaElement.controls = true;
-        mediaElement.autoplay = true;
-        mediaElement.loop = true;
+        mediaElement.controls = false; // hide native controls initially
     } else {
         alert("Unsupported file type!");
         return;
@@ -201,22 +193,19 @@ mediaWrapper.addEventListener("click", () => {
     media.style.height = "100%";
     media.style.objectFit = "contain";
 
-    if (media.tagName === "VIDEO") {
-        media.autoplay = true;
-        media.controls = true;
-        media.loop = true;
-        media.play();
-    }
-
     overlay.style.display = "flex";
 
-    // Request true browser fullscreen
-    if (overlay.requestFullscreen) {
-        overlay.requestFullscreen();
-    } else if (overlay.webkitRequestFullscreen) {
-        overlay.webkitRequestFullscreen();
-    } else if (overlay.msRequestFullscreen) {
-        overlay.msRequestFullscreen();
+    // Request fullscreen on overlay
+    if (overlay.requestFullscreen) overlay.requestFullscreen();
+    else if (overlay.webkitRequestFullscreen) overlay.webkitRequestFullscreen();
+    else if (overlay.msRequestFullscreen) overlay.msRequestFullscreen();
+
+    // Start video AFTER fullscreen is requested
+    if (media.tagName === "VIDEO") {
+        media.autoplay = true;
+        media.controls = true; // show controls in fullscreen
+        media.loop = true;
+        media.play();
     }
 });
 
@@ -226,13 +215,9 @@ overlay.addEventListener("click", () => {
     fsContent.innerHTML = "";
 
     // Exit true fullscreen
-    if (document.fullscreenElement) {
-        document.exitFullscreen();
-    } else if (document.webkitFullscreenElement) {
-        document.webkitExitFullscreen();
-    } else if (document.msFullscreenElement) {
-        document.msExitFullscreen();
-    }
+    if (document.fullscreenElement) document.exitFullscreen();
+    else if (document.webkitFullscreenElement) document.webkitExitFullscreen();
+    else if (document.msFullscreenElement) document.msExitFullscreen();
 });
 </script>
 
