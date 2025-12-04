@@ -81,6 +81,26 @@
         transform: scale(1);
     }
 
+    /* Fullscreen overlay */
+    #fullscreenOverlay {
+        display: none;
+        position: fixed;
+        top:0;
+        left:0;
+        width:100%;
+        height:100%;
+        background:black;
+        justify-content:center;
+        align-items:center;
+        z-index:9999;
+        cursor: pointer;
+    }
+
+    #fsContent {
+        max-width: 100%;
+        max-height: 100%;
+    }
+
     p {
         color: #666;
         font-size: 14px;
@@ -101,11 +121,19 @@
 
 <div id="mediaWrapper"></div>
 
+<!-- Fullscreen overlay -->
+<div id="fullscreenOverlay">
+    <div id="fsContent"></div>
+</div>
+
 <script>
 const fileInput = document.getElementById("fileInput");
 const mediaWrapper = document.getElementById("mediaWrapper");
 const dropZone = document.getElementById("dropZone");
+const overlay = document.getElementById("fullscreenOverlay");
+const fsContent = document.getElementById("fsContent");
 
+// Handle file selection
 function handleFile(file) {
     mediaWrapper.innerHTML = ""; 
     const type = file.type;
@@ -132,6 +160,7 @@ function handleFile(file) {
     setTimeout(() => mediaElement.classList.add("visible"), 10);
 }
 
+// Drag & drop events
 dropZone.addEventListener("dragover", e => {
     e.preventDefault();
     dropZone.classList.add("dragover");
@@ -147,14 +176,34 @@ dropZone.addEventListener("drop", e => {
     if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
 });
 
+// File input change
 fileInput.addEventListener("change", () => {
     if (fileInput.files[0]) handleFile(fileInput.files[0]);
 });
 
+// Fullscreen overlay logic
 mediaWrapper.addEventListener("click", () => {
-    if (mediaWrapper.requestFullscreen) mediaWrapper.requestFullscreen();
-    else if (mediaWrapper.webkitRequestFullscreen) mediaWrapper.webkitRequestFullscreen();
-    else if (mediaWrapper.msRequestFullscreen) mediaWrapper.msRequestFullscreen();
+    fsContent.innerHTML = mediaWrapper.innerHTML; // clone media
+    const media = fsContent.querySelector("#preview");
+
+    media.style.maxWidth = "100%";
+    media.style.maxHeight = "100%";
+    media.style.borderRadius = "0";
+
+    if (media.tagName === "VIDEO") {
+        media.autoplay = true;
+        media.controls = true;
+        media.loop = true;
+        media.play();
+    }
+
+    overlay.style.display = "flex";
+});
+
+// Exit fullscreen on click
+overlay.addEventListener("click", () => {
+    overlay.style.display = "none";
+    fsContent.innerHTML = "";
 });
 </script>
 
