@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Responsive Media Fullscreen Viewer</title>
+<title>Fullscreen Media Viewer</title>
 
 <style>
     body {
@@ -108,7 +108,7 @@
     #fsContent video {
         width: 100%;
         height: 100%;
-        object-fit: contain; /* maintains aspect ratio */
+        object-fit: contain; /* keeps aspect ratio */
     }
 
     p {
@@ -199,7 +199,7 @@ mediaWrapper.addEventListener("click", () => {
     media.style.borderRadius = "0";
     media.style.width = "100%";
     media.style.height = "100%";
-    media.style.objectFit = "contain"; // scale proportionally
+    media.style.objectFit = "contain";
 
     if (media.tagName === "VIDEO") {
         media.autoplay = true;
@@ -209,12 +209,30 @@ mediaWrapper.addEventListener("click", () => {
     }
 
     overlay.style.display = "flex";
+
+    // Request true browser fullscreen
+    if (overlay.requestFullscreen) {
+        overlay.requestFullscreen();
+    } else if (overlay.webkitRequestFullscreen) {
+        overlay.webkitRequestFullscreen();
+    } else if (overlay.msRequestFullscreen) {
+        overlay.msRequestFullscreen();
+    }
 });
 
 // Exit fullscreen on click
 overlay.addEventListener("click", () => {
     overlay.style.display = "none";
     fsContent.innerHTML = "";
+
+    // Exit true fullscreen
+    if (document.fullscreenElement) {
+        document.exitFullscreen();
+    } else if (document.webkitFullscreenElement) {
+        document.webkitExitFullscreen();
+    } else if (document.msFullscreenElement) {
+        document.msExitFullscreen();
+    }
 });
 </script>
 
