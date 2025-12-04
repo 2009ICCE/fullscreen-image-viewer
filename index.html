@@ -2,124 +2,33 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fullscreen Media Viewer</title>
-
 <style>
-body {
-    font-family: "Inter", Arial, sans-serif;
-    background: #ffffff;
-    color: #222;
-    margin: 0;
-    padding: 20px;
-    text-align: center;
-}
-
-h2 {
-    color: #30a9e0;
-    font-weight: 600;
-}
-
+body { margin:0; font-family: sans-serif; text-align:center; background:#fff; color:#222; padding:20px; }
+h2 { color:#30a9e0; }
 .upload-box {
-    margin: 20px auto;
-    padding: 30px;
-    width: min(90%, 500px);
-    background: #f9f9f9;
-    border: 2px dashed #30a9e055;
-    border-radius: 16px;
-    transition: 0.3s;
+    margin:20px auto; padding:20px; width:min(90%,400px);
+    border:2px dashed #30a9e055; border-radius:12px;
+    transition:.3s;
 }
-
-.upload-box.dragover {
-    border-color: #30a9e0;
-    background: #e9f6ff;
-}
-
+.upload-box.dragover { border-color:#30a9e0; background:#e9f6ff; }
 #uploadLabel {
-    display: inline-block;
-    padding: 12px 24px;
-    font-size: 16px;
-    color: white;
-    background: #30a9e0;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.25s;
-    box-shadow: 0px 4px 10px rgba(48,169,224,0.3);
-    margin-top: 10px;
+    display:inline-block; padding:10px 20px; color:#fff;
+    background:#30a9e0; border-radius:8px; cursor:pointer;
 }
-
-#uploadLabel:hover { background: #2594c5; }
-#fileInput { display: none; }
-
-#mediaWrapper {
-    margin-top: 20px;
-    display: none;
-    width: 100%;
-    text-align: center;
-    cursor: pointer;
-}
-
-#preview {
-    max-width: 95%;
-    max-height: 60vh;
-    border-radius: 12px;
-    box-shadow: 0px 8px 25px rgba(0,0,0,0.15);
-    opacity: 0;
-    transform: scale(0.98);
-    transition: 0.4s ease;
-    display: block;
-    margin: 0 auto;
-}
-
-#preview.visible {
-    opacity: 1;
-    transform: scale(1);
-}
-
-/* Fullscreen overlay */
+#uploadLabel:hover { background:#2594c5; }
+#fileInput { display:none; }
+#mediaWrapper { margin-top:20px; cursor:pointer; }
+#preview { max-width:95%; max-height:50vh; border-radius:12px; transition:.3s; display:block; margin:0 auto; }
 #fullscreenOverlay {
-    display: none;
-    position: fixed;
-    top:0;
-    left:0;
-    width:100vw;
-    height:100vh;
-    background:black;
-    justify-content:center;
-    align-items:center;
-    z-index:9999;
-    cursor: pointer;
-    touch-action: manipulation; /* mobile */
+    display:none; position:fixed; top:0; left:0; width:100vw; height:100vh;
+    background:black; justify-content:center; align-items:center; z-index:9999; cursor:pointer;
+    display:flex;
 }
-
-#fsContent {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-}
-
-#fsContent img,
-#fsContent video {
-    max-width: 100vw;
-    max-height: 100vh;
-    width: auto;
-    height: auto;
-    object-fit: contain; /* locks aspect ratio */
-    border-radius: 0;
-}
-
-p { color: #666; font-size: 14px; margin-top: 10px; }
-
-/* Mobile adjustments */
-@media (max-width: 768px) {
-    .upload-box { padding: 20px; }
-    #preview { max-height: 40vh; }
-}
+#fsContent img,#fsContent video { max-width:100vw; max-height:100vh; width:auto; height:auto; object-fit:contain; }
 </style>
 </head>
-
 <body>
 
 <h2>Upload Media (Image, GIF, MP4)</h2>
@@ -131,11 +40,7 @@ p { color: #666; font-size: 14px; margin-top: 10px; }
 </div>
 
 <div id="mediaWrapper"></div>
-
-<!-- Fullscreen overlay -->
-<div id="fullscreenOverlay">
-    <div id="fsContent"></div>
-</div>
+<div id="fullscreenOverlay"><div id="fsContent"></div></div>
 
 <script>
 const fileInput = document.getElementById("fileInput");
@@ -144,85 +49,43 @@ const dropZone = document.getElementById("dropZone");
 const overlay = document.getElementById("fullscreenOverlay");
 const fsContent = document.getElementById("fsContent");
 
-// Handle file selection
-function handleFile(file) {
-    mediaWrapper.innerHTML = ""; 
-    const type = file.type;
-
-    let mediaElement;
-    if (type.startsWith("image/")) {
-        mediaElement = document.createElement("img");
-        mediaElement.src = URL.createObjectURL(file);
-    } else if (type === "video/mp4") {
-        mediaElement = document.createElement("video");
-        mediaElement.src = URL.createObjectURL(file);
-        mediaElement.controls = false; // hide native controls initially
-        mediaElement.playsInline = true; // mobile inline playback
-    } else {
-        alert("Unsupported file type!");
-        return;
-    }
-
-    mediaElement.id = "preview";
-    mediaWrapper.appendChild(mediaElement);
-    mediaWrapper.style.display = "block";
-
-    setTimeout(() => mediaElement.classList.add("visible"), 10);
+// Handle file upload
+function handleFile(file){
+    mediaWrapper.innerHTML = "";
+    let media;
+    if(file.type.startsWith("image/")) media=document.createElement("img"), media.src=URL.createObjectURL(file);
+    else if(file.type==="video/mp4") media=document.createElement("video"), media.src=URL.createObjectURL(file), media.playsInline=true, media.controls=false;
+    else return alert("Unsupported file type");
+    media.id="preview";
+    mediaWrapper.appendChild(media);
+    mediaWrapper.style.display="block";
 }
 
-// Drag & drop events
-dropZone.addEventListener("dragover", e => {
-    e.preventDefault();
-    dropZone.classList.add("dragover");
+// Drag & drop
+dropZone.addEventListener("dragover",e=>{ e.preventDefault(); dropZone.classList.add("dragover"); });
+dropZone.addEventListener("dragleave",()=>{ dropZone.classList.remove("dragover"); });
+dropZone.addEventListener("drop",e=>{ e.preventDefault(); dropZone.classList.remove("dragover"); if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+fileInput.addEventListener("change",()=>{ if(fileInput.files[0]) handleFile(fileInput.files[0]); });
+
+// Fullscreen
+mediaWrapper.addEventListener("click",()=>{
+    fsContent.innerHTML=mediaWrapper.innerHTML;
+    const media=fsContent.querySelector("#preview");
+    overlay.style.display="flex";
+    if(overlay.requestFullscreen) overlay.requestFullscreen();
+    else if(overlay.webkitRequestFullscreen) overlay.webkitRequestFullscreen();
+    else if(overlay.msRequestFullscreen) overlay.msRequestFullscreen();
+    if(media.tagName==="VIDEO") media.autoplay=true, media.controls=true, media.loop=true, media.play();
 });
 
-dropZone.addEventListener("dragleave", () => {
-    dropZone.classList.remove("dragover");
-});
-
-dropZone.addEventListener("drop", e => {
-    e.preventDefault();
-    dropZone.classList.remove("dragover");
-    if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
-});
-
-// File input change
-fileInput.addEventListener("change", () => {
-    if (fileInput.files[0]) handleFile(fileInput.files[0]);
-});
-
-// Fullscreen overlay logic
-mediaWrapper.addEventListener("click", () => {
-    fsContent.innerHTML = mediaWrapper.innerHTML;
-    const media = fsContent.querySelector("#preview");
-
-    overlay.style.display = "flex";
-
-    // Request fullscreen on overlay
-    if (overlay.requestFullscreen) overlay.requestFullscreen();
-    else if (overlay.webkitRequestFullscreen) overlay.webkitRequestFullscreen();
-    else if (overlay.msRequestFullscreen) overlay.msRequestFullscreen();
-
-    // Start video after fullscreen request
-    if (media.tagName === "VIDEO") {
-        media.autoplay = true;
-        media.controls = true;
-        media.loop = true;
-        media.play();
-    }
-});
-
-// Exit fullscreen on click
-overlay.addEventListener("click", () => {
-    overlay.style.display = "none";
-    fsContent.innerHTML = "";
-
-    // Exit fullscreen
-    if (document.fullscreenElement) document.exitFullscreen();
-    else if (document.webkitFullscreenElement) document.webkitExitFullscreen();
-    else if (document.msFullscreenElement) document.msExitFullscreen();
+// Exit fullscreen
+overlay.addEventListener("click",()=>{
+    overlay.style.display="none";
+    fsContent.innerHTML="";
+    if(document.fullscreenElement) document.exitFullscreen();
+    else if(document.webkitFullscreenElement) document.webkitExitFullscreen();
+    else if(document.msFullscreenElement) document.msExitFullscreen();
 });
 </script>
-
 </body>
 </html>
