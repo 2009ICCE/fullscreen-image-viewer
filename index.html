@@ -106,7 +106,7 @@ h2 {
     max-height: 100vh;
     width: auto;
     height: auto;
-    object-fit: contain;
+    object-fit: contain; /* locks aspect ratio */
     border-radius: 0;
 }
 
@@ -114,12 +114,8 @@ p { color: #666; font-size: 14px; margin-top: 10px; }
 
 /* Mobile adjustments */
 @media (max-width: 768px) {
-    .upload-box {
-        padding: 20px;
-    }
-    #preview {
-        max-height: 40vh;
-    }
+    .upload-box { padding: 20px; }
+    #preview { max-height: 40vh; }
 }
 </style>
 </head>
@@ -161,7 +157,7 @@ function handleFile(file) {
         mediaElement = document.createElement("video");
         mediaElement.src = URL.createObjectURL(file);
         mediaElement.controls = false; // hide native controls initially
-        mediaElement.playsInline = true; // mobile
+        mediaElement.playsInline = true; // mobile inline playback
     } else {
         alert("Unsupported file type!");
         return;
@@ -221,7 +217,7 @@ overlay.addEventListener("click", () => {
     overlay.style.display = "none";
     fsContent.innerHTML = "";
 
-    // Exit true fullscreen
+    // Exit fullscreen
     if (document.fullscreenElement) document.exitFullscreen();
     else if (document.webkitFullscreenElement) document.webkitExitFullscreen();
     else if (document.msFullscreenElement) document.msExitFullscreen();
